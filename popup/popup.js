@@ -61,6 +61,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
+    // Force Fill
+    document.getElementById('forceFill').addEventListener('click', async () => {
+        const status = document.getElementById('profileStatus');
+        showStatus(status, 'Triggering Auto-Fill...', 'success');
+
+        try {
+            const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+            if (tab) {
+                chrome.tabs.sendMessage(tab.id, { action: "force_fill" }, (response) => {
+                    if (chrome.runtime.lastError) {
+                        showStatus(status, 'Error: Refresh page first.', 'error');
+                    } else {
+                        window.close(); // Close popup to let user see
+                    }
+                });
+            }
+        } catch (e) {
+            showStatus(status, 'Error triggering fill', 'error');
+        }
+    });
+
     // Add Field
     document.getElementById('addField').addEventListener('click', () => {
         const fieldName = prompt("Enter the name of the new field:");
