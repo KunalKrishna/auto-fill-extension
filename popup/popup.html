@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Auto-Fill Settings</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <img src="../icons/icon48.png" alt="Logo" class="logo">
+            <h1>Auto-Fill Settings</h1>
+        </header>
+
+        <div class="section">
+            <h2>API Settings</h2>
+            <div class="input-group">
+                <input type="password" id="apiKey" placeholder="Enter your Gemini API Key">
+            </div>
+            <div class="input-group" style="margin-top: 10px;">
+                <select id="modelSelect">
+                    <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                    <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+                    <option value="gemini-1.5-flash-latest">Gemini 1.5 Flash (Latest)</option>
+                    <option value="gemini-1.5-pro-latest">Gemini 1.5 Pro (Latest)</option>
+                    <option value="gemini-flash-latest">Gemini Flash (Latest)</option>
+                    <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                    <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+                    <option value="gemini-3-flash-preview">Gemini 3 Flash Preview</option>
+                    <option value="gemini-3-pro-preview">Gemini 3 Pro Preview</option>
+                </select>
+                <button id="saveKey">Save Config</button>
+            </div>
+            <p class="status" id="keyStatus"></p>
+        </div>
+
+        <div class="section">
+            <h2>Personal Details</h2>
+            <p class="hint">These details will be used to fill forms.</p>
+
+            <div class="form-grid" id="profileFields">
+                <!-- Dynamic fields will be added here -->
+            </div>
+
+            <button id="addField" class="secondary-btn">+ Add Field</button>
+            <button id="saveProfile" class="primary-btn">Save Profile</button>
+            <hr>
+            <button id="forceFill" class="primary-btn" style="background-color: #fbbc04; color: #3c4043;">Force
+                Auto-Fill Page</button>
+            <p class="status" id="profileStatus"></p>
+        </div>
+    </div>
+    <script src="popup.js"></script>
+</body>
+
+</html>
