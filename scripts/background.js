@@ -1,11 +1,15 @@
 import { generateContent } from '../utils/gemini.js';
 
+console.log("[Gemini Auto-Fill] Background Service Worker Started");
+
 // Setup Context Menu
 chrome.runtime.onInstalled.addListener(() => {
-    chrome.contextMenus.create({
-        id: "save-to-profile",
-        title: "Save value to Auto-Fill Profile",
-        contexts: ["editable"]
+    chrome.contextMenus.removeAll(() => {
+        chrome.contextMenus.create({
+            id: "save-to-profile",
+            title: "Save value to Auto-Fill Profile",
+            contexts: ["editable"]
+        });
     });
 });
 
@@ -46,9 +50,12 @@ async function saveToProfile(value, label) {
 
 // Handle Messages
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    console.log("[Gemini Auto-Fill] Background received message:", request.action);
     if (request.action === "analyze_and_map") {
         handleAnalysis(request.formData, request.userProfile).then(sendResponse);
         return true; // Keep channel open
+    } else if (request.action === "ping") {
+        sendResponse({ status: "ok" });
     }
 });
 
