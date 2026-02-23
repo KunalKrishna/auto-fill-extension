@@ -18,19 +18,19 @@
         <div class="section">
             <h2>API Settings</h2>
             <div class="input-group">
-                <input type="password" id="apiKey" placeholder="Enter your Gemini API Key">
+                <label for="providerSelect">Provider:</label>
+                <select id="providerSelect">
+                    <option value="gemini">Google Gemini</option>
+                    <option value="anthropic">Anthropic Claude</option>
+                </select>
             </div>
             <div class="input-group" style="margin-top: 10px;">
+                <input type="password" id="apiKey" placeholder="Enter API Key">
+            </div>
+            <div class="input-group" style="margin-top: 10px;">
+                <label for="modelSelect">Model:</label>
                 <select id="modelSelect">
-                    <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
-                    <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
-                    <option value="gemini-1.5-flash-latest">Gemini 1.5 Flash (Latest)</option>
-                    <option value="gemini-1.5-pro-latest">Gemini 1.5 Pro (Latest)</option>
-                    <option value="gemini-flash-latest">Gemini Flash (Latest)</option>
-                    <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
-                    <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
-                    <option value="gemini-3-flash-preview">Gemini 3 Flash Preview</option>
-                    <option value="gemini-3-pro-preview">Gemini 3 Pro Preview</option>
+                    <!-- Options populated via JS based on provider -->
                 </select>
                 <button id="saveKey">Save Config</button>
             </div>

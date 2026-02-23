@@ -11,36 +11,101 @@ const DEFAULT_FIELDS = {
     "Portfolio URL": ""
 };
 
+const MODEL_OPTIONS = {
+    gemini: [
+        { value: "gemini-1.5-flash", label: "Gemini 1.5 Flash" },
+        { value: "gemini-1.5-pro", label: "Gemini 1.5 Pro" },
+        { value: "gemini-1.5-flash-latest", label: "Gemini 1.5 Flash (Latest)" },
+        { value: "gemini-1.5-pro-latest", label: "Gemini 1.5 Pro (Latest)" },
+        { value: "gemini-2.5-flash", label: "Gemini 2.5 Flash" },
+        { value: "gemini-2.5-pro", label: "Gemini 2.5 Pro" }
+    ],
+    anthropic: [
+        { value: "claude-sonnet-4-6", label: "Claude Sonnet 4.6" },
+        { value: "claude-opus-4-6", label: "Claude Opus 4.6" },
+        { value: "claude-opus-4-5-20251101", label: "Claude Opus 4.5" },
+        { value: "claude-haiku-4-5-20251001", label: "Claude Haiku 4.5" },
+        { value: "claude-sonnet-4-5-20250929", label: "Claude Sonnet 4.5" },
+        { value: "claude-opus-4-1-20250805", label: "Claude Opus 4.1" },
+        { value: "claude-opus-4-20250514", label: "Claude Opus 4" },
+        { value: "claude-sonnet-4-20250514", label: "Claude Sonnet 4" },
+        { value: "claude-3-5-sonnet-20240620", label: "Claude 3.5 Sonnet" },
+        { value: "claude-3-opus-20240229", label: "Claude 3 Opus" },
+        { value: "claude-3-haiku-20240307", label: "Claude 3 Haiku" }
+    ]
+};
+
 document.addEventListener('DOMContentLoaded', async () => {
     const profileStatus = document.getElementById('profileStatus');
     const keyStatus = document.getElementById('keyStatus');
     const apiKeyInput = document.getElementById('apiKey');
+    const providerSelect = document.getElementById('providerSelect');
     const modelSelect = document.getElementById('modelSelect');
     const profileFieldsContainer = document.getElementById('profileFields');
 
     // Load Settings
-    const data = await chrome.storage.local.get(['geminiApiKey', 'geminiModel', 'userProfile']);
+    const data = await chrome.storage.local.get(['geminiApiKey', 'anthropicApiKey', 'selectedProvider', 'selectedModel', 'userProfile']);
 
-    if (data.geminiApiKey) {
-        apiKeyInput.value = data.geminiApiKey;
-    }
+    const provider = data.selectedProvider || 'gemini';
+    providerSelect.value = provider;
 
-    if (data.geminiModel) {
-        modelSelect.value = data.geminiModel;
+    updateModelOptions(provider);
+
+    if (provider === 'gemini') {
+        apiKeyInput.value = data.geminiApiKey || '';
     } else {
-        modelSelect.value = "gemini-1.5-flash-latest"; // Default
+        apiKeyInput.value = data.anthropicApiKey || '';
     }
+
+    if (data.selectedModel) {
+        modelSelect.value = data.selectedModel;
+    }
+
+    function updateModelOptions(selectedProvider) {
+        modelSelect.innerHTML = '';
+        MODEL_OPTIONS[selectedProvider].forEach(opt => {
+            const option = document.createElement('option');
+            option.value = opt.value;
+            option.textContent = opt.label;
+            modelSelect.appendChild(option);
+        });
+    }
+
+    // Handle Provider Change
+    providerSelect.addEventListener('change', async () => {
+        const newProvider = providerSelect.value;
+        updateModelOptions(newProvider);
+
+        // Load correct API key for this provider
+        const keys = await chrome.storage.local.get(['geminiApiKey', 'anthropicApiKey']);
+        apiKeyInput.value = (newProvider === 'gemini' ? keys.geminiApiKey : keys.anthropicApiKey) || '';
+
+        // Pick first model as default if switching
+        modelSelect.selectedIndex = 0;
+    });
 
     const userProfile = data.userProfile || DEFAULT_FIELDS;
     renderFields(userProfile);
 
     // Save API Key & Model
     document.getElementById('saveKey').addEventListener('click', () => {
+        const provider = providerSelect.value;
         const key = apiKeyInput.value.trim();
         const model = modelSelect.value;
 
         if (key) {
-            chrome.storage.local.set({ geminiApiKey: key, geminiModel: model }, () => {
+            const settingsToSave = {
+                selectedProvider: provider,
+                selectedModel: model
+            };
+
+            if (provider === 'gemini') {
+                settingsToSave.geminiApiKey = key;
+            } else {
+                settingsToSave.anthropicApiKey = key;
+            }
+
+            chrome.storage.local.set(settingsToSave, () => {
                 showStatus(keyStatus, 'Configuration Saved!', 'success');
             });
         } else {

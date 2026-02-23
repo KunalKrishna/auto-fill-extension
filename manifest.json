@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Gemini Auto-Fill",
+  "name": "Resume Auto-Fill",
   "version": "1.0",
-  "description": "Intelligent form filler using Gemini API",
+  "description": "Intelligent form filler using AI(Gemini/Anthropic) API",
   "permissions": [
     "storage",
     "activeTab",
@@ -10,7 +10,8 @@
     "contextMenus"
   ],
   "host_permissions": [
-    "https://generativelanguage.googleapis.com/*"
+    "https://generativelanguage.googleapis.com/*",
+    "https://api.anthropic.com/*"
   ],
   "action": {
     "default_popup": "popup/popup.html",

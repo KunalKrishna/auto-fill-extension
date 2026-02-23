@@ -1,4 +1,4 @@
-import { generateContent } from '../utils/gemini.js';
+import { generateContent } from '../utils/ai_provider.js';
 
 console.log("[Gemini Auto-Fill] Background Service Worker Started");
 
@@ -61,10 +61,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 async function handleAnalysis(formData, userProfile) {
     try {
-        const data = await chrome.storage.local.get(['geminiApiKey', 'geminiModel']);
-        if (!data.geminiApiKey) return { error: "No API Key" };
+        const data = await chrome.storage.local.get(['selectedProvider', 'geminiApiKey', 'anthropicApiKey', 'selectedModel']);
 
-        const model = data.geminiModel || "gemini-1.5-flash";
+        const provider = data.selectedProvider || 'gemini';
+        const apiKey = provider === 'gemini' ? data.geminiApiKey : data.anthropicApiKey;
+        const model = data.selectedModel || (provider === 'gemini' ? 'gemini-1.5-flash' : 'claude-3-5-sonnet-20240620');
+
+        if (!apiKey) return { error: `No API Key for ${provider}` };
 
         const prompt = `
       You are an intelligent form filling assistant.
@@ -87,7 +90,7 @@ async function handleAnalysis(formData, userProfile) {
       5. STRICTLY use only values from the User Profile. Do not generate fake data. If a field matches nothing in the profile, map it to null or omit it.
     `;
 
-        const resultText = await generateContent(data.geminiApiKey, prompt, model);
+        const resultText = await generateContent(provider, apiKey, model, prompt);
         console.log("Raw Gemini Response:", resultText);
 
         // Clean result (remove markdown code blocks if present)
