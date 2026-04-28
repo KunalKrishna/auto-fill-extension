@@ -61,11 +61,25 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 async function handleAnalysis(formData, userProfile) {
     try {
-        const data = await chrome.storage.local.get(['selectedProvider', 'geminiApiKey', 'anthropicApiKey', 'selectedModel']);
+        const data = await chrome.storage.local.get(['selectedProvider', 'geminiApiKey', 'anthropicApiKey', 'openaiApiKey', 'ollamaEndpoint', 'selectedModel']);
 
         const provider = data.selectedProvider || 'anthropic';
-        const apiKey = provider === 'gemini' ? data.geminiApiKey : data.anthropicApiKey;
-        const model = data.selectedModel || (provider === 'gemini' ? 'gemini-1.5-flash' : 'claude-haiku-4-5-20251001');
+        const apiKey = provider === 'gemini'
+            ? data.geminiApiKey
+            : provider === 'openai'
+                ? data.openaiApiKey
+                : provider === 'ollama'
+                    ? data.ollamaEndpoint
+                    : data.anthropicApiKey;
+        const model = data.selectedModel || (
+            provider === 'gemini'
+                ? 'gemini-1.5-flash'
+                : provider === 'anthropic'
+                    ? 'claude-haiku-4-5-20251001'
+                    : provider === 'openai'
+                        ? 'gpt-4o-mini'
+                        : 'llama3.1'
+        );
 
         if (!apiKey) return { error: `No API Key for ${provider}` };
 

@@ -10,5 +10,6 @@
     "LinkedIn URL": "https://www.linkedin.com/in/johndoe",
     "Portfolio URL": "https://johndoe.dev",
     "anthropicApiKey": "YOUR_ANTHROPIC_KEY_HERE",
-    "geminiApiKey": "YOUR_GEMINI_KEY_HERE"
+    "geminiApiKey": "YOUR_GEMINI_KEY_HERE",
+    "openaiApiKey": "YOUR_OPENAI_KEY_HERE"
 }

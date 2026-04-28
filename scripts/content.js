@@ -62,9 +62,15 @@ async function scanAndProcessForms() {
         return;
     }
 
-    const checkStorage = await chrome.storage.local.get(['selectedProvider', 'geminiApiKey', 'anthropicApiKey', 'userProfile']);
+    const checkStorage = await chrome.storage.local.get(['selectedProvider', 'geminiApiKey', 'anthropicApiKey', 'openaiApiKey', 'ollamaEndpoint', 'userProfile']);
     const provider = checkStorage.selectedProvider || 'anthropic';
-    const apiKey = provider === 'gemini' ? checkStorage.geminiApiKey : checkStorage.anthropicApiKey;
+    const apiKey = provider === 'gemini'
+        ? checkStorage.geminiApiKey
+        : provider === 'openai'
+            ? checkStorage.openaiApiKey
+            : provider === 'ollama'
+                ? checkStorage.ollamaEndpoint
+                : checkStorage.anthropicApiKey;
 
     if (!apiKey || !checkStorage.userProfile) {
         log(`Missing API Key for ${provider} or Profile.`);

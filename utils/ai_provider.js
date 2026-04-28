@@ -3,6 +3,10 @@ export async function generateContent(provider, apiKey, model, prompt) {
         return await generateGeminiContent(apiKey, model, prompt);
     } else if (provider === 'anthropic') {
         return await generateAnthropicContent(apiKey, model, prompt);
+    } else if (provider === 'openai') {
+        return await generateOpenAIContent(apiKey, model, prompt);
+    } else if (provider === 'ollama') {
+        return await generateOllamaContent(apiKey, model, prompt);
     } else {
         throw new Error(`Unsupported provider: ${provider}`);
     }
@@ -63,4 +67,62 @@ async function generateAnthropicContent(apiKey, model, prompt) {
 
     const data = await response.json();
     return data.content[0].text;
+}
+
+async function generateOpenAIContent(apiKey, model, prompt) {
+    const url = 'https://api.openai.com/v1/chat/completions';
+
+    const payload = {
+        model: model,
+        messages: [
+            { role: 'user', content: prompt }
+        ],
+        temperature: 0.1
+    };
+
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'OpenAI API Error');
+    }
+
+    const data = await response.json();
+    return data.choices?.[0]?.message?.content || '';
+}
+
+async function generateOllamaContent(apiKey, model, prompt) {
+    const baseUrl = apiKey || 'http://localhost:11434';
+    const url = `${baseUrl.replace(/\/$/, '')}/api/chat`;
+
+    const payload = {
+        model: model,
+        messages: [
+            { role: 'user', content: prompt }
+        ],
+        stream: false
+    };
+
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Ollama API Error');
+    }
+
+    const data = await response.json();
+    return data.message?.content || '';
 }
