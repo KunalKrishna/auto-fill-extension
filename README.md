@@ -1,20 +1,21 @@
 # Intelligent Form Filler Extension
 
-An AI-powered Chrome Extension that automatically fills web forms using your personal profile data and Google Gemini.
+An AI-powered Chrome Extension that automatically fills web forms using your personal profile data and either Google Gemini or Anthropic Claude.
 
 Demo : https://jumpshare.com/s/w8f8ybLwfr4OCGLkYpeZ
 
 ## Features
 - **Auto-Fill**: Automatically detects forms and fills them with your saved details.
-- **Context Aware**: Uses Gemini AI to understand form fields (even with weird names) and map them to your profile.
+- **Context Aware**: Uses Gemini or Claude AI to understand form fields (even with weird names) and map them to your profile.
 - **Force Fill**: Manually trigger form filling on difficult pages.
 - **Right-Click to Save**: Easily add new fields to your profile by right-clicking them on any webpage.
-- **Secure**: Your API Key and Data are stored locally in your browser (`chrome.storage.local`).
+- **Secure**: Your API keys and data are stored locally in your browser (`chrome.storage.local`).
 
 ## Requirements
 - **Google Chrome** (or Chromium-based browser).
-- **Gemini API Key**: You need a free API key from Google.
-  - Get it here: [https://aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)
+- **One AI API Key**: Use either of the following providers:
+   - **Google Gemini API Key** from Google AI Studio: [https://aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)
+   - **Anthropic API Key** from the Anthropic Console
 
 ## Installation
 1. Clone or download this repository.
@@ -26,8 +27,9 @@ Demo : https://jumpshare.com/s/w8f8ybLwfr4OCGLkYpeZ
 ## How to Use
 1. **Setup**:
    - Click the extension icon in your toolbar.
-   - Paste your **Gemini API Key** and click "Save Config".
-   - (Optional) Select a different Gemini Model if you wish.
+   - Choose **Google Gemini** or **Anthropic Claude** from the provider selector.
+   - Paste the matching API key and click "Save Config".
+   - (Optional) Select a model for the chosen provider.
 2. **Create Profile**:
    - Fill in your details (Name, Address, etc.) in the extension popup.
    - Click "**+ Add Field**" to add custom fields (e.g., "LinkedIn", "Portfolio", "Veteran Status").
@@ -43,5 +45,13 @@ Demo : https://jumpshare.com/s/w8f8ybLwfr4OCGLkYpeZ
 
 ## Troubleshooting
 - **Not filling?** Try the "Force Auto-Fill Page" button.
-- **Error in console?** Press `F12` to open Developer Tools and look for `[Gemini Auto-Fill]` messages.
-- **Quota Exceeded?** Ensure your API Key is valid and has quota.
+- **Error in console?** Press `F12` to open Developer Tools and look for `[Gemini Auto-Fill]` or provider-specific messages.
+- **Quota Exceeded?** Ensure your selected provider API key is valid and has quota.
+
+## Supported Providers
+- **Google Gemini**: The extension supports multiple Gemini models, including Gemini 1.5 and Gemini 2.5 variants.
+- **Anthropic Claude**: The extension supports Claude models through Anthropic's Messages API, including Claude 3, 3.5, 4, and 4.5 families.
+
+## Config File Import
+- You can import a JSON profile that contains either `geminiApiKey` or `anthropicApiKey`.
+- If both keys are present, the extension will keep both and use the selected provider when filling forms.

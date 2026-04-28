@@ -41,7 +41,7 @@ if (document.readyState === 'complete') {
 }
 
 function log(msg, data) {
-    console.log(`[Gemini Auto-Fill] ${msg}`, data || '');
+    console.log(`[AI Auto-Fill] ${msg}`, data || '');
 }
 
 async function scanAndProcessForms() {
@@ -62,9 +62,12 @@ async function scanAndProcessForms() {
         return;
     }
 
-    const checkStorage = await chrome.storage.local.get(['geminiApiKey', 'userProfile']);
-    if (!checkStorage.geminiApiKey || !checkStorage.userProfile) {
-        log("Missing API Key or Profile.");
+    const checkStorage = await chrome.storage.local.get(['selectedProvider', 'geminiApiKey', 'anthropicApiKey', 'userProfile']);
+    const provider = checkStorage.selectedProvider || 'anthropic';
+    const apiKey = provider === 'gemini' ? checkStorage.geminiApiKey : checkStorage.anthropicApiKey;
+
+    if (!apiKey || !checkStorage.userProfile) {
+        log(`Missing API Key for ${provider} or Profile.`);
         return;
     }
 
@@ -72,21 +75,21 @@ async function scanAndProcessForms() {
 
     for (const container of formContainers) {
         if (container.querySelectorAll('input:not([type="hidden"]), select, textarea').length > 0) {
-            processForm(container, checkStorage.userProfile, checkStorage.geminiApiKey);
+            processForm(container, checkStorage.userProfile);
             // We generally only want to fill the main form, but maybe we should try all valid ones?
             // Let's stick continuously to avoid breaking multiple sections.
         }
     }
 }
 
-async function processForm(form, profile, apiKey) {
+async function processForm(form, profile) {
     const formSnapshot = extractFormSnapshot(form);
 
     // Don't waste API calls on empty forms
     if (Object.keys(formSnapshot).length === 0) return;
 
-    // Send to Background to ask Gemini
-    log("Sending form to Gemini for analysis...", formSnapshot);
+    // Send to Background to ask AI
+    log("Sending form to AI for analysis...", formSnapshot);
     chrome.runtime.sendMessage({
         action: "analyze_and_map",
         formData: formSnapshot,
@@ -96,11 +99,11 @@ async function processForm(form, profile, apiKey) {
             log("Error communicating with background:", chrome.runtime.lastError);
             return;
         }
-        log("Received response from Gemini:", response);
+        log("Received response from AI:", response);
         if (response && response.mappings) {
             applyMappings(form, response.mappings);
         } else if (response && response.error) {
-            log("Gemini Error:", response.error);
+            log("AI Error:", response.error);
         }
     });
 }

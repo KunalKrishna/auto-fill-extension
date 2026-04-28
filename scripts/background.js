@@ -1,6 +1,6 @@
 import { generateContent } from '../utils/ai_provider.js';
 
-console.log("[Gemini Auto-Fill] Background Service Worker Started");
+console.log("[AI Auto-Fill] Background Service Worker Started");
 
 // Setup Context Menu
 chrome.runtime.onInstalled.addListener(() => {
@@ -50,7 +50,7 @@ async function saveToProfile(value, label) {
 
 // Handle Messages
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    console.log("[Gemini Auto-Fill] Background received message:", request.action);
+    console.log("[AI Auto-Fill] Background received message:", request.action);
     if (request.action === "analyze_and_map") {
         handleAnalysis(request.formData, request.userProfile).then(sendResponse);
         return true; // Keep channel open
@@ -63,9 +63,9 @@ async function handleAnalysis(formData, userProfile) {
     try {
         const data = await chrome.storage.local.get(['selectedProvider', 'geminiApiKey', 'anthropicApiKey', 'selectedModel']);
 
-        const provider = data.selectedProvider || 'gemini';
+        const provider = data.selectedProvider || 'anthropic';
         const apiKey = provider === 'gemini' ? data.geminiApiKey : data.anthropicApiKey;
-        const model = data.selectedModel || (provider === 'gemini' ? 'gemini-1.5-flash' : 'claude-3-5-sonnet-20240620');
+        const model = data.selectedModel || (provider === 'gemini' ? 'gemini-1.5-flash' : 'claude-haiku-4-5-20251001');
 
         if (!apiKey) return { error: `No API Key for ${provider}` };
 
@@ -91,7 +91,7 @@ async function handleAnalysis(formData, userProfile) {
     `;
 
         const resultText = await generateContent(provider, apiKey, model, prompt);
-        console.log("Raw Gemini Response:", resultText);
+        console.log(`Raw ${provider} Response:`, resultText);
 
         // Clean result (remove markdown code blocks if present)
         const cleaned = resultText.replace(/```json/g, '').replace(/```/g, '').trim();

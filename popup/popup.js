@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Load Settings
     const data = await chrome.storage.local.get(['geminiApiKey', 'anthropicApiKey', 'selectedProvider', 'selectedModel', 'userProfile']);
 
-    const provider = data.selectedProvider || 'gemini';
+    const provider = data.selectedProvider || 'anthropic';
     providerSelect.value = provider;
 
     updateModelOptions(provider);
@@ -124,6 +124,52 @@ document.addEventListener('DOMContentLoaded', async () => {
         chrome.storage.local.set({ userProfile: newProfile }, () => {
             showStatus(profileStatus, 'Profile Saved!', 'success');
         });
+    });
+
+    // Import from JSON
+    const importBtn = document.getElementById('importJson');
+    const fileInput = document.getElementById('jsonFile');
+
+    importBtn.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const json = JSON.parse(event.target.result);
+
+                // Extract API keys if present and not empty
+                const keysToSave = {};
+                if (json.anthropicApiKey) {
+                    keysToSave.anthropicApiKey = json.anthropicApiKey;
+                    if (providerSelect.value === 'anthropic') apiKeyInput.value = json.anthropicApiKey;
+                }
+                if (json.geminiApiKey) {
+                    keysToSave.geminiApiKey = json.geminiApiKey;
+                    if (providerSelect.value === 'gemini') apiKeyInput.value = json.geminiApiKey;
+                }
+
+                if (Object.keys(keysToSave).length > 0) {
+                    chrome.storage.local.set(keysToSave);
+                }
+
+                // Remove keys from object before rendering fields
+                const { anthropicApiKey, geminiApiKey, ...profileData } = json;
+                renderFields(profileData);
+
+                showStatus(profileStatus, 'JSON Imported! Click Save to persist profile.', 'success');
+            } catch (err) {
+                showStatus(profileStatus, 'Error parsing JSON file.', 'error');
+            }
+        };
+        reader.readAsText(file);
+        // Reset file input so same file can be imported twice
+        fileInput.value = '';
     });
 
     // Force Fill

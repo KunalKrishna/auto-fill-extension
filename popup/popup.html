@@ -46,7 +46,11 @@
             </div>
 
             <button id="addField" class="secondary-btn">+ Add Field</button>
-            <button id="saveProfile" class="primary-btn">Save Profile</button>
+            <div style="margin-top: 10px; display: flex; gap: 10px;">
+                <button id="importJson" class="secondary-btn" style="flex: 1;">Import from JSON</button>
+                <input type="file" id="jsonFile" accept=".json" style="display: none;">
+                <button id="saveProfile" class="primary-btn" style="flex: 1;">Save Profile</button>
+            </div>
             <hr>
             <button id="forceFill" class="primary-btn" style="background-color: #fbbc04; color: #3c4043;">Force
                 Auto-Fill Page</button>
