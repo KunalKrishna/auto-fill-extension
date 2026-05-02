@@ -45,6 +45,13 @@ function log(msg, data) {
 }
 
 async function scanAndProcessForms() {
+    // Check if extension is enabled
+    const checkEnabled = await chrome.storage.local.get('extensionEnabled');
+    if (checkEnabled.extensionEnabled === false) {
+        log("Extension is disabled, skipping scan.");
+        return;
+    }
+    
     log("Scanning for forms...");
     let formContainers = Array.from(document.querySelectorAll('form'));
 

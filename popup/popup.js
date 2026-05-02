@@ -55,9 +55,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const providerSelect = document.getElementById('providerSelect');
     const modelSelect = document.getElementById('modelSelect');
     const profileFieldsContainer = document.getElementById('profileFields');
+    const extensionToggle = document.getElementById('extensionToggle');
+    const toggleLabel = document.getElementById('toggleLabel');
 
     // Load Settings
-    const data = await chrome.storage.local.get(['geminiApiKey', 'anthropicApiKey', 'openaiApiKey', 'ollamaEndpoint', 'selectedProvider', 'selectedModel', 'userProfile']);
+    const data = await chrome.storage.local.get(['geminiApiKey', 'anthropicApiKey', 'openaiApiKey', 'ollamaEndpoint', 'selectedProvider', 'selectedModel', 'userProfile', 'extensionEnabled']);
+    
+    // Initialize toggle state (default to ON)
+    const isEnabled = data.extensionEnabled !== false;
+    extensionToggle.checked = isEnabled;
+    toggleLabel.textContent = isEnabled ? 'ON' : 'OFF';
 
     const provider = data.selectedProvider || 'anthropic';
     providerSelect.value = provider;
@@ -123,6 +130,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const userProfile = data.userProfile || DEFAULT_FIELDS;
     renderFields(userProfile);
+
+    // Handle Extension Toggle
+    extensionToggle.addEventListener('change', () => {
+        const isEnabled = extensionToggle.checked;
+        toggleLabel.textContent = isEnabled ? 'ON' : 'OFF';
+        chrome.storage.local.set({ extensionEnabled: isEnabled }, () => {
+            showStatus(keyStatus, isEnabled ? 'Extension enabled' : 'Extension disabled', 'success');
+        });
+    });
 
     // Save API Key & Model
     document.getElementById('saveKey').addEventListener('click', () => {

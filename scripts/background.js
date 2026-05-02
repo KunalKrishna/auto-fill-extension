@@ -61,7 +61,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 async function handleAnalysis(formData, userProfile) {
     try {
-        const data = await chrome.storage.local.get(['selectedProvider', 'geminiApiKey', 'anthropicApiKey', 'openaiApiKey', 'ollamaEndpoint', 'selectedModel']);
+        const data = await chrome.storage.local.get(['extensionEnabled', 'selectedProvider', 'geminiApiKey', 'anthropicApiKey', 'openaiApiKey', 'ollamaEndpoint', 'selectedModel']);
+        
+        // Check if extension is enabled
+        if (data.extensionEnabled === false) {
+            return { error: 'Extension is disabled' };
+        }
 
         const provider = data.selectedProvider || 'anthropic';
         const apiKey = provider === 'gemini'
